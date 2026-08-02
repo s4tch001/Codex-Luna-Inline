@@ -5,6 +5,10 @@
   "version": "0.2.0",
   "publisher": "local-codex",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s4tch001/Codex-Luna-Inline.git"
+  },
   "engines": {
     "vscode": "^1.125.0"
   },
