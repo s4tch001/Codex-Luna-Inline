@@ -1,0 +1,203 @@
+{
+  "name": "codex-luna-inline",
+  "displayName": "Codex Luna Inline",
+  "description": "Automatic inline code completions powered by GPT-5.6 Luna through your local, ChatGPT-authenticated Codex CLI.",
+  "version": "0.2.0",
+  "publisher": "local-codex",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "codex",
+    "chatgpt",
+    "inline completion",
+    "autocomplete",
+    "gpt-5.6-luna"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "Source context is sent to the authenticated Codex CLI, so the extension runs only in trusted workspaces."
+    }
+  },
+  "main": "./dist/extension.js",
+  "types": "./dist/extension.d.ts",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "codexLunaInline.toggle",
+        "title": "Codex Luna Inline: Toggle Automatic Completions"
+      },
+      {
+        "command": "codexLunaInline.trigger",
+        "title": "Codex Luna Inline: Trigger Completion Now"
+      },
+      {
+        "command": "codexLunaInline.account",
+        "title": "Codex Luna Inline: Choose / Sign in to ChatGPT Account"
+      },
+      {
+        "command": "codexLunaInline.signIn",
+        "title": "Codex Luna Inline: Sign in with ChatGPT"
+      },
+      {
+        "command": "codexLunaInline.switchAccount",
+        "title": "Codex Luna Inline: Switch ChatGPT Account"
+      },
+      {
+        "command": "codexLunaInline.signOut",
+        "title": "Codex Luna Inline: Sign out"
+      },
+      {
+        "command": "codexLunaInline.showStatus",
+        "title": "Codex Luna Inline: Check Login Status"
+      },
+      {
+        "command": "codexLunaInline.showOutput",
+        "title": "Codex Luna Inline: Show Output Log"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "codexLunaInline.trigger",
+        "key": "alt+\\",
+        "mac": "option+\\",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Codex Luna Inline",
+      "properties": {
+        "codexLunaInline.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Enable automatic inline completions."
+        },
+        "codexLunaInline.codexPath": {
+          "type": "string",
+          "default": "codex",
+          "scope": "machine",
+          "description": "Codex CLI executable name or absolute path. This is an executable path only, not a shell command with arguments."
+        },
+        "codexLunaInline.model": {
+          "type": "string",
+          "default": "gpt-5.6-luna",
+          "scope": "window",
+          "description": "Codex model slug used for completions."
+        },
+        "codexLunaInline.reasoningEffort": {
+          "type": "string",
+          "enum": [
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh"
+          ],
+          "default": "low",
+          "scope": "window",
+          "description": "Reasoning effort. Low is recommended for responsive inline completion."
+        },
+        "codexLunaInline.debounceMs": {
+          "type": "number",
+          "default": 250,
+          "minimum": 100,
+          "maximum": 5000,
+          "scope": "window",
+          "description": "Wait time after typing before requesting an automatic completion."
+        },
+        "codexLunaInline.timeoutMs": {
+          "type": "number",
+          "default": 20000,
+          "minimum": 5000,
+          "maximum": 120000,
+          "scope": "window",
+          "description": "Maximum time allowed for one Codex CLI completion."
+        },
+        "codexLunaInline.maxPrefixChars": {
+          "type": "number",
+          "default": 30000,
+          "minimum": 1000,
+          "maximum": 80000,
+          "scope": "window",
+          "description": "Maximum source characters sent before the cursor."
+        },
+        "codexLunaInline.maxSuffixChars": {
+          "type": "number",
+          "default": 15000,
+          "minimum": 0,
+          "maximum": 50000,
+          "scope": "window",
+          "description": "Maximum source characters sent after the cursor."
+        },
+        "codexLunaInline.maxWholeFileChars": {
+          "type": "number",
+          "default": 80000,
+          "minimum": 5000,
+          "maximum": 250000,
+          "scope": "window",
+          "description": "Send the entire file when it is no larger than this limit. Larger files use a smart head/cursor/tail window."
+        },
+        "codexLunaInline.usePersistentServer": {
+          "type": "boolean",
+          "default": true,
+          "scope": "machine",
+          "description": "Keep Codex app-server warm for lower completion latency. Disable only for compatibility troubleshooting."
+        },
+        "codexLunaInline.maxSuggestionLines": {
+          "type": "number",
+          "default": 12,
+          "minimum": 1,
+          "maximum": 50,
+          "scope": "window",
+          "description": "Maximum number of lines in one inline suggestion."
+        },
+        "codexLunaInline.excludedFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/.env",
+            "**/.env.*",
+            "**/*secret*",
+            "**/*credentials*",
+            "**/*.pem",
+            "**/*.key",
+            "**/id_rsa*",
+            "**/.npmrc",
+            "**/.pypirc"
+          ],
+          "scope": "window",
+          "description": "Case-insensitive glob patterns for files that must never be sent to Codex for completion."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "clean": "node ./scripts/clean.mjs",
+    "compile": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run compile && node --test \"dist/test/*.test.js\"",
+    "package": "npm run clean && npm run test && vsce package --no-dependencies",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "1.125.0",
+    "@vscode/vsce": "3.9.2",
+    "typescript": "7.0.2"
+  }
+}
